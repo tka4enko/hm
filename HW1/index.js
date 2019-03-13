@@ -1,13 +1,20 @@
 //1
+
 let obj1 = { o: { test: [{ a: function() {} }]}};
 const obj2 = deepCopy(obj1);
-obj2.key = 2;
+obj2.o.test[1] = 10;
+console.log(obj1);
 console.log(obj2);
 
 function deepCopy(obj) {
     let arg = {};
+
     for (let key in obj){
-        arg[key] = obj[key];
+        if (typeof obj[key] === 'object'){
+            arg[key] = deepCopy(obj[key])
+        }else{
+            arg[key] = obj[key];
+        }
     }
     return arg;
 }
