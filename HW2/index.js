@@ -140,12 +140,14 @@ let objectCalc = {
 
 // console.log(six().substitute().five().equal());
 // // почему если передать objectCalc как параметр в функции то не находит методы в объекте
-function zero(){
-    objectCalc.results = 0;
+function zero(objectCalc){
+  console.log(objectCalc.results);
+  objectCalc.results = 0;
     return objectCalc;
 }
-function one(){
-    objectCalc.results = 1;
+function one(objectCalc){
+  console.log(objectCalc.results);
+  objectCalc.results = 1;
     return objectCalc;
 }
 function two(){
