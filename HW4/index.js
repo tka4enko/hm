@@ -7,34 +7,130 @@ let objectCalc = {
     multiply: false,
     divide: false,
   },
-  onChangeVariant: (item) => {
-    const el = document.getElementsByClassName(item);
-    console.log(el);
-  },
-  init: () => {
-    const selectElement = document.getElementsByClassName('calc-select');
-    console.log(selectElement);
+  onChangeVariant: function (item) {
+    const selectElement = document.getElementsByClassName(item);
     selectElement[0].addEventListener('change', event => {
-      console.log(event);
+      const val = event.target.value;
+      let args = [];
+      if (val === 'programmer') {
+        args = [
+          {
+            className: 'x2',
+            title: 'x2'
+          },
+          {
+            className: 'x16',
+            title: 'x16'
+          }
+        ];
+      }
+      if (val === 'math') {
+        args = [
+          {
+            className: 'percent',
+            title: '%'
+          },
+          {
+            className: 'squareroot',
+            title: 'Square root'
+          }
+        ];
+      }
+      if (val === 'standart') {
+        args = [
+          {
+            className: 'add',
+            title: '+'
+          },
+          {
+            className: 'substitute',
+            title: '-'
+          },
+          {
+            className: 'multiply',
+            title: '*'
+          },
+          {
+            className: 'divide',
+            title: '/'
+          }
+        ];
+
+      }
+      this.createTemplate(args);
     });
   },
+  onClick: function (el) {
+    const clickElement = document.getElementsByClassName(el);
+    clickElement[0].addEventListener('click', event => {
+     const target = event.target;
+      this[target.className]()
+    });
+  },
+  init: function () {
+    this.onChangeVariant('calc-select');
+    this.onClick('calc-math');
+  },
+  createTemplate: function (args) {
+    let calcElemtnt = document.getElementsByClassName('calc-math')[0];
+    calcElemtnt.innerHTML = '';
+    args.map((item, index) => {
+      let listItem = document.createElement("li");
+      let newButton = document.createElement("a");
+      listItem.appendChild(newButton);
+      newButton.setAttribute('class', item.className);
+      newButton.setAttribute('href', '#');
+      let buttonContent = document.createTextNode(item.title);
+      newButton.appendChild(buttonContent);
+      calcElemtnt.appendChild(listItem);
+    });
+  },
+  x2: function () {
+    console.log('x2 ok1111');
+    this.check.x2 = true;
+    this.updateValue();
+    return objectCalc;
+  },
+  x16: function () {
+    console.log('x16 ok1111');
+    this.check.x16 = true;
+    this.updateValue();
+    return objectCalc;
+  },
+  percent: function () {
+    console.log('percent ok1111');
+    this.check.x16 = true;
+    this.updateValue();
+    return objectCalc;
+  },
+  squareroot: function () {
+    console.log('squareroot ok1111');
+    this.check.x16 = true;
+    this.updateValue();
+    return objectCalc;
+  },
   add: function () {
+    console.log('add ok1111');
     this.check.add = true;
     this.updateValue();
     return objectCalc;
   },
   substitute: function () {
+    console.log('substitute ok1111');
     this.check.substitute = true;
+    this.updateValue();
     this.updateValue();
     return objectCalc;
   },
   multiply: function () {
+    console.log('multiply ok1111');
     this.check.multiply = true;
     this.updateValue();
     return objectCalc;
   },
   divide: function () {
     this.check.divide = true;
+    console.log('divide ok1111');
     this.updateValue();
     return objectCalc;
   },
