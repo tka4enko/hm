@@ -6,6 +6,10 @@ let objectCalc = {
     substitute: false,
     multiply: false,
     divide: false,
+    percent: false,
+    squareroot: false,
+    x2:false,
+    x16: false
   },
   onChangeVariant: function (item) {
     const selectElement = document.getElementsByClassName(item);
@@ -21,6 +25,10 @@ let objectCalc = {
           {
             className: 'x16',
             title: 'x16'
+          },
+          {
+            className: 'equal',
+            title: '='
           }
         ];
       }
@@ -33,7 +41,12 @@ let objectCalc = {
           {
             className: 'squareroot',
             title: 'Square root'
+          },
+          {
+            className: 'equal',
+            title: '='
           }
+
         ];
       }
       if (val === 'standart') {
@@ -53,6 +66,10 @@ let objectCalc = {
           {
             className: 'divide',
             title: '/'
+          },
+          {
+            className: 'equal',
+            title: '='
           }
         ];
 
@@ -60,16 +77,25 @@ let objectCalc = {
       this.createTemplate(args);
     });
   },
+  actionOnOptions: function (el) {
+    const clickElement = document.getElementsByClassName(el);
+    clickElement[0].addEventListener('click', event => {
+      const target = event.target;
+      this[target.className]()
+    });
+  },
   onClick: function (el) {
     const clickElement = document.getElementsByClassName(el);
     clickElement[0].addEventListener('click', event => {
-     const target = event.target;
-      this[target.className]()
+      const target = event.target;
+      this.value += target.innerHTML;
+      this.updateValue();
     });
   },
   init: function () {
     this.onChangeVariant('calc-select');
-    this.onClick('calc-math');
+    this.actionOnOptions('calc-math');
+    this.onClick('calc-list');
   },
   createTemplate: function (args) {
     let calcElemtnt = document.getElementsByClassName('calc-math')[0];
@@ -85,60 +111,58 @@ let objectCalc = {
       calcElemtnt.appendChild(listItem);
     });
   },
-  x2: function () {
-    console.log('x2 ok1111');
-    this.check.x2 = true;
-    this.updateValue();
-    return objectCalc;
-  },
-  x16: function () {
-    console.log('x16 ok1111');
-    this.check.x16 = true;
-    this.updateValue();
-    return objectCalc;
-  },
-  percent: function () {
-    console.log('percent ok1111');
-    this.check.x16 = true;
-    this.updateValue();
-    return objectCalc;
-  },
-  squareroot: function () {
-    console.log('squareroot ok1111');
-    this.check.x16 = true;
-    this.updateValue();
-    return objectCalc;
-  },
   add: function () {
-    console.log('add ok1111');
     this.check.add = true;
-    this.updateValue();
+    this.mathResults();
+    this.updateValue(this.results);
     return objectCalc;
   },
   substitute: function () {
-    console.log('substitute ok1111');
     this.check.substitute = true;
-    this.updateValue();
-    this.updateValue();
+    this.mathResults();
+    this.updateValue(this.results);
     return objectCalc;
   },
   multiply: function () {
-    console.log('multiply ok1111');
     this.check.multiply = true;
-    this.updateValue();
+    this.mathResults();
+    this.updateValue(this.results);
     return objectCalc;
   },
   divide: function () {
     this.check.divide = true;
-    console.log('divide ok1111');
-    this.updateValue();
+    this.mathResults();
+    this.updateValue(this.results);
+    return objectCalc;
+  },
+  x2: function () {
+    this.check.x2 = true;
+    this.mathResults();
+    this.updateValue(this.results);
+    return objectCalc;
+  },
+  x16: function () {
+    this.check.x16 = true;
+    this.mathResults();
+    this.updateValue(this.results);
+    return objectCalc;
+  },
+  percent: function () {
+    this.check.percent = true;
+    this.mathResults();
+    this.updateValue(this.results);
+    return objectCalc;
+  },
+  squareroot: function () {
+    this.check.squareroot = true;
+    this.mathResults();
+    this.updateValue(this.results);
     return objectCalc;
   },
   equal: function () {
-    this.updateValue();
     console.log(this.results);
+    this.mathResults();
     document.getElementsByClassName('calc-item')[0].value = this.results;
-    this.results = '';
     return objectCalc;
   },
   updateMathParams: function () {
@@ -147,23 +171,58 @@ let objectCalc = {
     }
   },
   mathResults: function () {
+    if (this.check.squareroot) {
+      this.results = Math.sqrt(this.results ? this.results : this.value);
+      this.updateMathParams();
+      this.value = '';
+    }
+    if (this.check.x2) {
+      this.results = parseInt(this.value, 10).toString(2);
+      this.updateMathParams();
+      this.value = '';
+    }
+    if (this.check.x16) {
+      if (this.value < 10){
+        this.results = 'value should be more 10';
+      }else{
+        this.results = parseInt(this.value, 10).toString(16);
+      }
+      this.updateMathParams();
+      this.value = '';
+    }
     if (this.results) {
-      if (this.check.add) {
-        this.results = this.results + this.value;
+      if (this.check.add && this.value) {
+        this.results = parseInt(this.results) + parseInt(this.value);
+        this.updateMathParams();
+        this.value = '';
       }
-      if (this.check.divide) {
-        this.results = this.results / this.value;
+      if (this.check.divide && this.value) {
+        this.results = parseInt(this.results) / parseInt(this.value);
+        this.updateMathParams();
+        this.value = '';
       }
-      if (this.check.multiply) {
+      if (this.check.multiply && this.value) {
         this.results = this.results * this.value;
+        this.updateMathParams();
+        this.value = '';
       }
       if (this.check.substitute) {
         this.results = this.results - this.value;
+        this.updateMathParams();
+        this.value = '';
+        console.log(this);
+      }
+      if (this.check.percent) {
+        this.results = ((this.value/100) * this.results).toFixed(2);
+        this.updateMathParams();
+        this.value = '';
+        console.log(this);
       }
     } else {
       this.results = this.value;
+      this.value = '';
     }
-    this.updateMathParams();
+    this.updateValue(this.results);
   },
   reset: function () {
     this.results = '';
@@ -171,8 +230,11 @@ let objectCalc = {
     this.updateValue();
     return objectCalc;
   },
-  updateValue: function () {
-    document.getElementsByClassName('calc-item')[0].value = this.value;
+  updateValue: function (result) {
+    if (result === 0) {
+      result = '0';
+    }
+    document.getElementsByClassName('calc-item')[0].value = result ? result : this.value;
   }
 };
 
