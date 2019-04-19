@@ -13,7 +13,6 @@ class Calculator extends Component {
       <Grid columns={5}>
         <Grid.Row columns={1}>
           <Grid.Column>
-            <   />
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
