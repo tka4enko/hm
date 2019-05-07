@@ -7,6 +7,7 @@ import {
 } from "../components/Command/actions";
 
 const initialState = {
+  undo: [],
   results: "",
   first: "",
   second: "",
@@ -72,11 +73,13 @@ export default (state = initialState, action) => {
     case BUTTON_CLICK: {
       const result = Object.assign({}, state);
       result.results += action.data;
+      result.undo.push(result.results);
       return formatResult(result);
     }
     case BUTTON_COMMAND_CLICK: {
       const result = Object.assign({}, state,{operation: action.data});
       result.results += action.data;
+      result.undo.push(result.results);
       return formatResult(result);
     }
     case EQUAL_CLICK: {
@@ -90,7 +93,13 @@ export default (state = initialState, action) => {
       );
     }
     case BUTTON_UNDO_CLICK: {
-      console.log(state);
+      const result = Object.assign({}, state);
+      if (!!result.undo.length){
+        result.undo.pop();
+        result.results = result.undo.slice(-1);
+        return formatResult(result);
+      }
+      return formatResult(result);
     }
     case CLEAR_CLICK: {
       return initialState;
