@@ -87,6 +87,9 @@ class Calculator extends Component {
           <Grid.Column>
             <Command text={"="} type={"equal"} />
           </Grid.Column>
+          <Grid.Column>
+            <Command text={"UNDO"} type={"undo"} />
+          </Grid.Column>
         </Grid.Row>
       </Grid>
     );

@@ -1,11 +1,14 @@
 import {BUTTON_CLICK} from "../components/Number/actions";
 import {
+  BUTTON_UNDO_CLICK,
   BUTTON_COMMAND_CLICK,
   EQUAL_CLICK,
-  CLEAR_CLICK
+  CLEAR_CLICK,
 } from "../components/Command/actions";
 
 const initialState = {
+  undo: [],
+  results: "",
   first: "",
   second: "",
   operation: "",
@@ -13,23 +16,55 @@ const initialState = {
 
 const formatResult = state => ({
   ...state,
-  result: state.first + state.operation + state.second,
+  result: state.results,
 });
+
+const generateArgs = (expression) => {
+  let copy = expression;
+  expression = expression.replace(/[0-9]+/g, "#");
+  let numbers = copy.split(/[^0-9\.]+/);
+  let operators = expression.split("#").filter(function (n) {
+    return n
+  });
+  let result = [];
+
+  for (let i = 0; i < numbers.length; i++) {
+    result.push(numbers[i]);
+    if (i < operators.length){
+      result.push(operators[i]);
+    }
+  }
+  return result;
+};
+
 const countResult = state => {
   let result = 0;
-  console.log(state);
-  if (state.operation === '+' && state.second.length) {
-    result = Number(state.first) + Number(state.second);
-  }
-  if (state.operation === '-' && state.second.length) {
-    result = state.first - state.second;
-  }
-  if (state.operation === '*' && state.second.length) {
-    result = state.first * state.second;
-  }
-  if (state.operation === '/' && state.second.length) {
-    result = state.first / state.second;
-  }
+  const args = generateArgs(state.results);
+  args.map((item, i) => {
+    if (item === '+') {
+      if (!result) {
+        result = Number(args[i - 1]) + Number(args[i + 1]);
+      } else {
+        result = result + Number(args[i + 1]);
+      }
+    }
+    if (item === '*') {
+      console.log(args[i]);
+      if (!result) {
+        result = args[i - 1] * args[i + 1];
+      } else {
+        result = result * args[i + 1];
+      }
+    }
+    if (item === '/') {
+      console.log(args[i]);
+      if (!result) {
+        result = args[i - 1] / args[i + 1];
+      } else {
+        result = result / args[i + 1];
+      }
+    }
+  });
   return result;
 };
 
@@ -37,27 +72,15 @@ export default (state = initialState, action) => {
   switch (action.type) {
     case BUTTON_CLICK: {
       const result = Object.assign({}, state);
-      if (!state.operation) {
-        result.first += action.data;
-        return formatResult(result);
-      }
-      result.second += action.data;
+      result.results += action.data;
+      result.undo.push(result.results);
       return formatResult(result);
     }
     case BUTTON_COMMAND_CLICK: {
-      if(!!state.operation){
-        return Object.assign(
-          {},
-          {
-            count: countResult(state),
-            result: false
-          },
-          {...initialState}
-        );
-      }else{
-        const result = Object.assign({}, state, {operation: action.data});
-        return formatResult(result);
-      }
+      const result = Object.assign({}, state,{operation: action.data});
+      result.results += action.data;
+      result.undo.push(result.results);
+      return formatResult(result);
     }
     case EQUAL_CLICK: {
       return Object.assign(
@@ -68,6 +91,15 @@ export default (state = initialState, action) => {
         },
         {...initialState}
       );
+    }
+    case BUTTON_UNDO_CLICK: {
+      const result = Object.assign({}, state);
+      if (!!result.undo.length){
+        result.undo.pop();
+        result.results = result.undo.slice(-1);
+        return formatResult(result);
+      }
+      return formatResult(result);
     }
     case CLEAR_CLICK: {
       return initialState;
